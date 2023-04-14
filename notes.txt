@@ -71,6 +71,7 @@ I. Course Content + Introduction
 
 
 
+
 5. TypeScript
 
 - Using TypeScript instead of vanilla JavaScript.
@@ -112,3 +113,17 @@ B. When following a tutorial, don't blindly replicate the end-product.
 
 II. Node.js + Express + TypeScript Setup (Hello World)
 
+9. Tools used:
+
+- VS Code
+- Node.js
+
+
+10. Why is Node.js needed?
+
+- It has a usecase since JS is mainly used for writing code for client-side applications.
+- Node.js allows writing backend server-side code for building web applications.
+- Front-end code can be viewed by programmers as it is exposed via the client-side.
+- Hence, to store confidential data programmatically such as credentials, backend server-side code is essential.
+- Morever, any sort of form or input validations can be circumvented if their code logic was present in the frontend on the client-side.
+- Server-side code is essentially a black box for the  outside world and can only be accessed via network requests and that too with appropriate keys or credentials.
