@@ -1,0 +1,114 @@
+MERN Full Stack Web App Tutorial
+- https://www.youtube.com/watch?v=FcxjCPeicvU
+
+-----------------------------------
+04/13/23
+
+I. Course Content + Introduction
+-------------------------------------
+
+1. CRUD
+
+- Represents four basic operations that can be performed on data in a database or other software system.
+    - Create: Add new data.
+    - Read: Retrieve existing data.
+    - Update: Modify existing data.
+    - Delete: Remove existing data.
+
+2. Deployment and Hosting 
+
+- Linode used for website hosting and domain name registration cum acquisition.
+- I will try Vercel or GitHub pages.
+
+
+3. Features of Web App
+
+- Not adding too many features:
+  - Add some features and understand concepts clearly
+
+- CRUD operations available on Notes
+  - Last updated timestamp provided as well.
+
+- Navigate between sections
+
+- React Bootstrap used for designing app layout
+  - Fading long text towards bottom edge of Note
+  - Shadow on hover effect
+
+- Responsive UI design
+  - Ensure app works on mobile devices as well.
+
+- Authentication: 
+    - Login functionality provided to users.
+    - Tools used: 
+        - Sessions, Cookies instead of JSON Web Tokens (JWTs)
+    - Existing User Validation done.
+
+
+4. MERN Stack
+
+- It is a JavaScript stack used for easier and faster deployment of full-stack web applications.
+
+- MongoDB: 
+    - A NoSQL database used to store and manage data stored as key-value pairs in JSON-like documents. 
+    - It is a scalable and flexible database that can handle large amounts of data.
+
+- Express.js: 
+    - A web application framework for Node.js that provides a set of features and tools for building web applications. 
+    - It is used to handle HTTP requests, define routes, and create APIs.
+
+- React: 
+    - A JavaScript library for building user interfaces. 
+    - It allows developers to create complex UI components and manage the state of the application efficiently.
+    - We will learn about: 
+        - React functional components and their reusability,
+        - React file and folder structure.
+        - Redux state management library.
+
+- Node.js: 
+    - A JavaScript runtime environment that allows developers to run backend JavaScript code on the server-side. 
+    - It provides a set of modules and tools that make it easy to build server-side applications.
+
+
+
+5. TypeScript
+
+- Using TypeScript instead of vanilla JavaScript.
+- It is a superset of JS and add a layer on top of JS.
+- It is provides strong typing to the language.
+- Can be used almost anywhere normal JS can be used.
+- For large-scale applications, it is not wise to use JS since variables can have any kind of values and soon everything might blow up.
+
+
+6. Idealogies
+
+A. Not fun to learn from scratch and basics and then build up.
+- Better to learn few basics and then dive into projects and learn on the go.
+- Google stuff when you require info and gain knowledge by making mistakes, resolving errors.
+
+B. When following a tutorial, don't blindly replicate the end-product.
+- Start customizing the project from the start itself.
+- Make minor changes as you progress.
+- Apply the concepts being taught in the tutorial.
+
+
+7. React Content Reloading
+
+- React web apps look more like mobile apps.
+- This is observed on clicking buttons to navigate to different sections of the app.
+- The entire page does not reload but only the content changes.
+- This is because React web apps are usually single web pages.
+- JS handles static elements and reloads them or brings them into context whenever required.
+- Thus React apps require JS to run since JS loads content or data.
+- This can be verified when on disabling JS in developer tools, the React app shows an error saying it needs JS to run.
+
+8. Client-side Rendering
+
+- Website loads more data from the server after it is already displayed in the browser
+- Next.js used to manage what data to handle on client and server sides.
+
+--------------------------------------------------------
+
+
+II. Node.js + Express + TypeScript Setup (Hello World)
+
