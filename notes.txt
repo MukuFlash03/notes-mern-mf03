@@ -53,7 +53,7 @@ I. Course Content + Introduction
     - A NoSQL database used to store and manage data stored as key-value pairs in JSON-like documents. 
     - It is a scalable and flexible database that can handle large amounts of data.
 
-- Express.js: 
+- Express: 
     - A web application framework for Node.js that provides a set of features and tools for building web applications. 
     - It is used to handle HTTP requests, define routes, and create APIs.
 
@@ -70,8 +70,6 @@ I. Course Content + Introduction
     - It provides a set of modules and tools that make it easy to build server-side applications.
 
 
-
-
 5. TypeScript
 
 - Using TypeScript instead of vanilla JavaScript.
@@ -79,6 +77,10 @@ I. Course Content + Introduction
 - It is provides strong typing to the language.
 - Can be used almost anywhere normal JS can be used.
 - For large-scale applications, it is not wise to use JS since variables can have any kind of values and soon everything might blow up.
+
+- Some features not mandatory in TS/JS but better to follow coding conventions used in most languages:
+  - Semicolons not needed to terminate lines
+  - '' and "" can be used interchangeably, stick to one.
 
 
 6. Idealogies
@@ -127,3 +129,181 @@ II. Node.js + Express + TypeScript Setup (Hello World)
 - Hence, to store confidential data programmatically such as credentials, backend server-side code is essential.
 - Morever, any sort of form or input validations can be circumvented if their code logic was present in the frontend on the client-side.
 - Server-side code is essentially a black box for the  outside world and can only be accessed via network requests and that too with appropriate keys or credentials.
+
+------------------
+
+04/16/23
+
+11. Node.js Installation
+
+https://www.youtube.com/watch?v=OMhMnj7SBRQ
+
+- Go to official Node.js website
+- Click on "Other Downloads" under LTS version
+- Click on "Installing via package manager"
+- Click on "Debian/Ubuntu"
+- Click on Node.js distributions (GitHub repo)
+- Find Ubuntu command:
+  $ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\ sudo apt-get install -y nodejs
+
+
+12. Node.js Setup for Project
+
+- Initialize project package.json file
+  $ npm init -y
+- "-y" : Uses all default values for configuration options
+
+
+13. TypeScript Installation for Project
+
+$ npm install --save-dev typescript
+
+- Here, TS is installed as a "dev dependency" for our current project.
+- This addition is reflected in the package.json file as well.
+- This means that whenever the project goes into Production, this dependency will be skipped as it is only used by developers to write code.
+
+
+- Upgrade npm
+  $ npm install -g npm@9.6.4
+- Two new files/folders added:
+  - package-lock.json: Related to package.json
+  - node_modules: Contains dependencies installed for this project
+
+
+- Generating a TS configuration file (tsconfig.json) that defines how TS should behave
+  $ npx tsc --init
+- npx vs npm: x -> execute
+- tsc: TS Compiler
+
+14. Express Installation
+
+- Shorthand command: i = install
+- No --save-dev this time, since this is a normal dependency.
+  $ npm i express
+
+- Dev dependency needed for TS to identify types for Express
+  $ npm i --save-dev @types/express
+
+- Sometimes dependencies may have been upgraded to newer versions compared to the ones in the tutorial and some errors might occur.
+- One option is to check out the official Release Notes for the version and try to implement the changes by yourself
+- Another easier option is to install a specific version, such as the one used in the tutorial, run:
+  $ npm i express@4.18.2
+
+
+
+15. Setting up your first Express server
+
+- Create a new TS file: server.ts
+- Import express and create a new server endpoint.
+- Assign a port number
+  - Some services required specific port numbers, for instance React uses 3000 by default.
+
+
+- Write a GET endpoint using app.get()
+- Start a server using app.listen()
+
+
+- Start the server using:
+  $ node server.ts
+- This returns an error since node only knows how to execute JS files.
+- To bypass this, TS files must be transmogrified or compiled into JS files using:
+  $ npx tsc
+- This generates JS files for the corresponding TS files in the pwd.
+- Now, execute $ node server.js, which should work:
+  - Outputs console message
+  - Server should be running and accessible at localhost:5000
+
+
+
+16. Code Repository Restructuring + Editing Config Files
+
+- Put all source code TS files into src/
+
+- Add command preference in tsconfig.json to segregate TS-to-JS compiled files from TS files.
+  - "outDir": "./dist"
+- Stop server
+- Reload/re-exeute TS configuration.
+  - How did it know that TS files are now under src/ ?
+    - It looks in all subdirectories as well and tries to mimic file/folder structure.
+- Restart server.
+
+- /dist can be deleted for now since JS files are required at the end once all development has been completed.
+
+- This entire process becomes tedious and repetitive since we need to perform these steps every time we update our TS files(s).
+- To automate this process, we will install and use another dev dependency - nodemon
+  $ npm i --save-dev nodemon
+- However, this depedency only works with JS.
+- Thankfully, there's another depedency which compiles TS code to JS on the fly.
+  $ npm i -D ts-node
+- Shorthand command: -D = --save-dev
+
+- Working of these dependencies:
+- To start server:
+  $ npx nodemon src/server.ts
+- While server is running, any saved changes will be reflected automatically while the server is already running.
+  - No need to stop server and restart it.
+
+- To add this commmand as a shorthand command, edit the package.json file to add a new entry "start" under scripts with a value of the command:
+  - "scripts": { "start": "nodemon src/server.ts", }
+- The server can now be started using:
+  $ npm start
+
+- Additionally, update the main entry point of the web app code by giving the path to the JS source code file:
+  - "main": "dist/server.js",
+
+
+
+17. Install ESLint
+
+- This is used for syntax linting which highlights errors in code.
+- Use this command to install ESLint:
+  $ npm i -D eslint
+
+- Execute eslint using --init to generate config file - .eslintrc.js
+  $ npx eslint --init
+- Follow the instructions on the console to install ESLint with required specifications:
+  - Syntax + Problems
+  - JS modules
+  - None of the above frameworks (Using Node.js)
+  - TS Yes!
+  - Code Run environment: Node.js
+  - JS Config file
+  - Yes
+  - Npm
+
+- ESLint config file:
+  - Code environment set to browser despite select node; change it.
+
+
+18. ESLint Usecases
+
+- For instance, assigning "undefined" Port number is not a good practice.
+- Append a '!' to the port parameter in app.listen()
+- This tells compiler that this value must not be undefined or null.
+- Execute ESLint to check TS files in the pwd:
+  $ npx eslint . --ext .ts
+- This gives a warning message reiterating the aforementioned issue.
+
+- Better to automate this command by adding a script in package.json
+  - "lint": "eslint . --ext .ts"
+- Execute using $ npm run lint
+  - Not using just $ npm lint, like we did for $ npm start.
+  - This is because "start" is internally defined as the shorthand for "run start".
+
+
+19. VS Code Extension for ESLint
+
+- This integrates the functionality into VS Code without the for manual executions to perform code checks.
+- Install extension: ESLint (Orange logo)
+- Now, IDE itself will point out errors/warnings.
+
+
+20. Add a .gitignore file
+
+- Copy the contents from the standard Node-gitignore file from GitHub
+  - https://github.com/github/gitignore/blob/main/Node.gitignore
+- node_modules not required.
+- Config files required to maintain a common standard between project team members (developers)
+
+
+

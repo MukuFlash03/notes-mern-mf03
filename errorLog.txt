@@ -5,7 +5,14 @@ MERN Full Stack Web App Tutorial
 Error Log
 
 -----------------------------------
-04/13/23
+04/16/23
+
+
+1. Notes #19: Unable to see ESLint warnings in VS Code after installing extension
+
+
+
+
 
 
 
