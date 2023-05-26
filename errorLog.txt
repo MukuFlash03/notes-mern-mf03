@@ -12,7 +12,18 @@ Error Log
 
 
 
+05/25/23
 
+2. Postman app not opening
+
+https://github.com/postmanlabs/postman-app-support/issues/9097
+
+- Need to download Postman app and not Postman Desktop agent.
+
+
+3. Mongoose Connection timed out.
+
+- If connected to a new network, need to add IP address in MongoDB Atlas web UI.
 
 
 

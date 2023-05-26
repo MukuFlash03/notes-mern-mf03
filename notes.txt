@@ -128,7 +128,7 @@ II. Node.js + Express + TypeScript Setup (Hello World)
 - Front-end code can be viewed by programmers as it is exposed via the client-side.
 - Hence, to store confidential data programmatically such as credentials, backend server-side code is essential.
 - Morever, any sort of form or input validations can be circumvented if their code logic was present in the frontend on the client-side.
-- Server-side code is essentially a black box for the  outside world and can only be accessed via network requests and that too with appropriate keys or credentials.
+- Server-side code is essentially a black box for the outside world and can only be accessed via network requests and that too with appropriate keys or credentials.
 
 ------------------
 
@@ -158,16 +158,17 @@ https://www.youtube.com/watch?v=OMhMnj7SBRQ
 
 $ npm install --save-dev typescript
 
+- Two new files/folders added:
+  - package-lock.json: Related to package.json
+  - node_modules: Contains dependencies installed for this project
+
 - Here, TS is installed as a "dev dependency" for our current project.
 - This addition is reflected in the package.json file as well.
 - This means that whenever the project goes into Production, this dependency will be skipped as it is only used by developers to write code.
 
 
-- Upgrade npm
+- Upgrade npm, if required
   $ npm install -g npm@9.6.4
-- Two new files/folders added:
-  - package-lock.json: Related to package.json
-  - node_modules: Contains dependencies installed for this project
 
 
 - Generating a TS configuration file (tsconfig.json) that defines how TS should behave
@@ -285,7 +286,7 @@ $ npm install --save-dev typescript
 - This gives a warning message reiterating the aforementioned issue.
 
 - Better to automate this command by adding a script in package.json
-  - "lint": "eslint . --ext .ts"
+  - "lint": "eslint . --ext .ts",
 - Execute using $ npm run lint
   - Not using just $ npm lint, like we did for $ npm start.
   - This is because "start" is internally defined as the shorthand for "run start".
@@ -304,6 +305,365 @@ $ npm install --save-dev typescript
   - https://github.com/github/gitignore/blob/main/Node.gitignore
 - node_modules not required.
 - Config files required to maintain a common standard between project team members (developers)
+
+
+
+05/24/23
+
+
+21. Are we building a RESTful API? If not, what's the difference between our server and a REST API?
+
+- REST APIs usually accessed by many clients
+- Hence they also fulfill certain constraints
+- For instance, they do not contain states
+- However, our server will contain states since for each user's login, there will be a session in the database that connects this user and lets the server know that this user is logged in
+- In contrast, we can also build a public REST API using the same endpoints, configurations from this project that serves data to multiple clients. 
+
+
+
+III. MongoDB Atlas + Mongoose Setup + Envalid
+
+22. MongoDB
+
+- It will serve as the main database for our app and will store notes as well as user data.
+- It is a schema-less or relation-less or non-relational DB, in contrast to a relational DB like SQL which has fixed datatypes and schema constraints.
+- This means that we can put any data into any document that we want in any combination.
+
+
+23. MongoDB Atlas
+
+- To host this DB we can either: self-host on our own server or, use a service like MongoDB Atlas which is a hosting provider for MongoDB databases.
+- Atlas takes care of many integral issues such as scaling, security, encryption, backup, etc.
+
+- Signup and create a new account.
+- Create a new cluster (follow on-screen instructions)
+- Connect to the cluster: create a new admin user (first user by default)
+- Choose connection type (application)
+
+- Store MongoDB created user credentials in your project directory
+- However, these must not be pushed to public git repo.
+- Hence store them in a git ignored file, for instance .env
+- This is a suitable file to store environment variables which may be configurational which change depending on where we run our server (localhost or internet deployment) and to store DB credentials
+
+- Create a new file .env in the backend server directory
+- Add a new variable that stores MongoDB credentials which should be the url string from the MongoDB website.
+- Also add the Port number here since this can change between deployments.
+
+- Install the npm package dependency for env
+  $ npm i dotenv  
+
+
+24. Mongoose
+
+- This is an object modeling package that makes it easier to work with MongoDB database.
+  $ npm i mongoose
+
+- Import both dotenv and mongoose in our server.ts file.
+- Ensure dotenv is imported earliest since environment variables will be available to the application code then.
+
+- Connect to the DB in code using mongoose.connect and use the environment variables defined in .env
+- Move the app.listen part inside the mongoose connection then operation which is reached after the connect promise is fulfilled.
+- Add a .catch() that displays error message in case of failure.
+
+
+25. Envalid package
+
+- process.env used to access variables defined inside .env file
+- MONGODB_CONNECTION_STR is highlighted as error by ESLint.
+- Undefined PORT is accepted but code will not run and ESLint unable to detect this.
+
+- To solve this, Envalid package is used which defines how our environment variables must look as per .env file and then it enforces this schema.
+  $ npm i envalid
+
+- util folder created inside src with a file validateEnv.ts
+- Pass environment variables from process.env here.
+- Export the default function and then import this in the server.ts file with any name as it is exported as default
+- Instead of process.env, now use env which refers to the imported package
+
+26. Directory restructuring
+
+- Separate the server code from the database code
+- Create a new file app.ts under src
+- Move some express, dotenv code to this file and export default app.
+- Import app in server.ts
+
+------------------------------------------------------------------------
+
+IV. MongoDB Model Setup + Express error handling + Middleware
+
+
+27. Defining a Note data object model
+
+- Create a new folder models under src.
+- Create a file note.ts that defines the schema or the data model for the note: title, text, timestamp.
+- Title and text are to be added as part of the note data model while timestamp can be added outside so that it can be generated by default by Mongoose.
+- Then define a new type of Note which is inferred from the note Schema data object model.
+- Finally, export the note model by using the above-defined data type and giving the collection a name followed by the variable referring to the note schema data object model.
+- Import the Note model with any name since default export is used.
+
+
+28. Create an endpoint for fetching Notes from MongoDB: Async-Await
+
+- We'll be using "await" which is syntactic sugar for handling promises in JS.
+- This is akin to using then, catch blocks but helps avoid the extra nested code.
+- Await wasn't used in server.ts when connecting to DB since we cannot use it at the top level in Express by default.
+- However, we can use it inside of our endpoint functions code.
+- But, we must also add "async" keyword in the endpoint parameters before the arrow function call.
+- This is done so that the code knows that the below code is asynchronous and waiting for a promise to be fulfilled.
+- This operation may take some time since we need to query the DB and we don't want the rest of the server to wait just for this.
+
+29. Endpoint
+
+- Reusing same get endpoint for Hello World.
+- Async-Await used.
+- Query the DB using the NoteModel and call find().exec(); exec() returns a promise.
+- Then, set the response status to 200 and return a JSON response
+
+30. MongoDB Website UI
+
+- Once server is restarted, the fetch operation is complete.
+- The website DB cluster can then be seen to contain a new "notes" collection on browsing to the View Collections tab.
+- The name is fetched from the definition in note.ts while exporting the model as a Collection; the name is pluralized automatically.
+
+- The default name of test is assigned.
+- To change this, edit the Connection string in .env file -> add DB name before query params.
+
+
+
+31. Add Notes Manually
+
+- Do this through the Atlas UI.
+- ID is automatically generated for each note.
+- Once note is inserted in the DB, it appears on the webpage as well.
+
+
+32. Error Handling in Express
+
+- Assume something goes wrong: DB is down, bad code written.
+- For now, manually throw an exception/error.
+- This causes the main webpage to crash, the app to crash, the server goes down, no other endpoints are accessible and nothing works anymore.
+
+
+- To handle these, use a try-catch block.
+- Try block contains code which might possibly lead to errors or cause exceptions.
+- Catch block contains code to handle these so that abrupt shutdown of services is avoided.
+
+
+33. Separate Error Handler
+
+- This code will have to repeated for each endpoint, hence we can define a separate function for error handling, common to all endpoints.
+- It will be an arrow function with a specific set of arguments such that Express can recognize it as an Error Handler.
+- These parameters are: error, req, res, next
+- We need to pass in parameter "error" and state its type as "unknown".
+  - Didn't need to mention types of req, res since it is part of GET request and TypeScript is able to infer these two as request and response parameters.
+- Req: Request, Res: Response, Next: NextFunction -> All 3 are from the Express package.
+- Each route must have a response or we must call next() which forwards requests to the next middleware which is a piece of code that knows how to handle a request.
+- Error handler must be the bottommost app.use() code block as next(error) request is forwarded from all one of the above middleware code blocks.
+  - Order of evaluations of middleware is from top to bottom.
+  - If more middleware blocks exist beyond error handler code block, and they don't have any error handler, then errors thrown by them will crash server.
+  - Hence, last block must be error handler, with the specific predefined set of arguments to handle all errors.
+
+34. Add Another Error Handler Middleware
+
+- This one is to handle non-existing endpoints
+- Simply call next(Error(message))
+- This will forward request to main Error Handler.
+- How does it know that it is the error handler for missing endpoints?
+
+------------------------------------------------------------------------
+
+
+V. Routers, Controllers, Creating Notes
+
+
+35. Separating Routes and Controllers 
+
+- Create two directories under src: routes, controllers.
+- Routes will contain the endpoints: get('/'), get('/viewNotes'), etc.
+- Controllers will contain the main code logic pertaining to what happens or what should happen when these endpoints are reached or triggered.
+
+- Code logic should be stored as functions in controllers which are then exported so that they can be imported elsewhere.
+- Types need to be declared again; can simply mention "RequestHandler" after function name as an alternative.
+- This is from the Express package and automatically helps in inferring types of parameters.
+
+- In routes, import all functions from the controller file and add specific after endpoint in app.get().
+- Function declaration passed and not function call.
+
+- App shows undefined error as express app server was defined in app.ts
+- To resolve this, create a new express.Router() this time, instead of creating another express() app server.
+- Then replace app.get() with router.get().
+
+- Export this router as default.
+- In app.ts, import this router and define a new endpoint, api/notes which will fetch notes.
+
+
+36. Telling Express what data should be accepted
+
+- This is done to filter data sent as messages to the server.
+- This is done in the app.ts file.
+- Add another middleware that is a function call to express.json() that specifies that we can both retrieve as well as send JSON data when using GET or POST endpoints, respectively.
+
+
+37. Creating endpoint for adding Notes
+
+- Add new postNotes() function to notes.ts in controllers
+- Add corresponding router.post() route with same endpoint as router.get() in notes.ts in routes
+- Same endpoint is acceptable as these two are different HTTP methods.
+
+- Fetch title and content from the note request object.
+- Inside try block, create a new note using the NoteModel.create(); this returns a Promise by itself hence don't require exec() like we did for find() in getNotes()
+- Return status of 201 (new resource created) just to distinguish all different endpoints.
+
+38. Using Postman to send POST requests
+
+- With a web browser we only have access to the server-side code so far, without any client.
+- We can only fetch data using GET requests and can't send POST requests.
+- For this, we will use a third-party tool called Postman.
+
+- Open up the HTTP requests interface in Postman.
+- Enter the localhost URL with the port and appropriate endpoint.
+- Select POST request.
+- Under Body choose raw and data type as JSON instead of Text.
+- Enter the JSON data for the note and click Send.
+- You should receive a response JSON and note should be available in MongoDB.
+- Additionally, running GET request in Postman also lists all notes which should include latest note.
+
+
+39. Creating a new GET endpoint to fetch a single note
+
+- Add a new route with path "/:noteid"
+  - noteid is a variable which will be read by Express and put into the request object.
+- Add the controller logic for this route.
+- Fetch noteID from request parameters (req.params).
+- Pass this noteID to Mongoose data object model using findById() and exec() to return a promise. 
+- Use Postman to send a GET request by appending a note's ID to request URL to test endpoint.
+
+
+40. Install Morgan package
+
+- This is a logging utility for logging all console messages sent, received by server.
+  $ npm i morgan 
+- Helpful to log messages to help sort issues in Production.
+- Run this to resolve compile error shown initially which adds type declarations for the package to work with TypeScript.
+  $ npm i --save-dev @types/morgan
+
+- Add a middleware for Morgan with "dev" passed as parameter.
+- This ensure console messages are logged appropriately in a clean manner.
+
+
+------------------------------------------------------------------------
+
+
+
+VI. Express HTTP Error Handling 
+
+
+41. Install HTTP_Error_Codes package
+
+- This helps with Error Codes and optimize Error Handling
+  $ npm i http-errors
+  $ npm i -D @types/http-errors   
+
+- Optimize code by not hardcoding status code.
+- Use createHttpError to pass status code when throwing error.
+- To check type of error, use isHttpError().
+- This is not default export hence enclose in {} when importing from http-errors.
+
+
+42. Improve error messages for Routes
+
+- For missing title, default Mongoose error message is displayed.
+- It is hard to read and doesn't have HTTP status code associated with it.
+
+
+43. Interfaces
+
+- Using these to define data types of fields in our Note JSON requests.
+- To define optional data, add a '?' after the field name and before ':'
+- Even mandatory fields should have a ? since we can't know if clients actually sent this data or it was empty.
+- Now this interface can be used by adding it as data type to controller function.
+- RequestHandler has four fields: URL Params, Response Body, Request Body, Request Query.
+- We will set 3rd field for Req Body with the interface type and leave the remaining three as unknown.
+- Any vs Unknown: The latter is more restrictive.
+- Now, both title and content inside the function have a data type other than 'any' as the types are inferred from the interface.
+
+
+44. Check Missing Title
+
+- Check if title isn't empty.
+- Else throw HttpError with status code 400 and appropriate error message.
+
+
+45. Check If Note Exists
+
+- GET request to fetch note with specific ID must only go through if the note ID exists.
+- Else throw HttpError with status code 404 and appropriate error message.
+
+- Length and format of note ID must also be checked, else default status code 500 is returned even if note ID is missing.
+- Use mongoose.isValidObjectID()
+
+------------------------------------------------------------------------
+
+VII. Updating and Deleting Notes
+
+
+46. Updating Notes
+
+- Create another function to update notes in controller/notes.ts.
+- Add error handling code by combining noteID and title checks from both GET and POST functions.
+- Create interfaces for both URLParams and JSON Note fields.
+- Fetch note using ID and update the fields.
+- Save updated note using note.save() with await (DB operation).
+- Return it with status code 200 as a JSON object.
+- Add route in Routes/note.ts with the PATCH HTTP method; patch verb handles resource update operations.
+
+
+47. Deleting Notes
+
+- Create a function to delete notes in controller/notes.ts.
+- Fetch the note using note ID and use similar error handling code.
+- No need for interfaces this time.
+- Delete note using note.deleteOne() with await (DB operation).
+- Use res.sendStatus() this time since with res.status.json(), the JSON part actually sends the request back.
+  - However, since no JSON part is present, we must send the status by itself which is done with the sendStatus().
+
+- Facing error on using note.remove(); hence using note.deleteOne().
+
+
+------------------------------------------------------------------------
+
+
+VIII. React Setup + Declarative UI
+
+
+48. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
 
 
 
