@@ -988,9 +988,104 @@ XIV. Loading/Error/Empty States
 XV. User Authentication with Express Sessions
 
 
-75. 
+75. MongoDB Schema for User Sessions
+
+- Need another schema to store login sessions for users.
+- Create a file user.ts in backend/models and add some fields to the schema.
+- Email and Password have default false so that they are not returned in any JSON response, etc.
 
 
+
+76. Endpoint Controllers for SignUp
+
+- Create a file users.ts in backend/controllers.
+- Create an interface, function for SignUp.
+
+- For password, use Raw hashed data variable.
+- Need to install a hashing encryption package:
+  $ npm i bcrypt
+  $ npm i -D @types/bcrypt  
+
+
+77. Endpoint Routes for SignUp
+
+- Create a file users.ts in backend/routes.
+- Add signup route.
+- Add userRoutes to app.ts as well.
+
+
+78. Express-Session Package
+
+- For user authentication, we'll use sessions through this package.
+  $ npm i express-session
+  $ npm i -D @types/express-session  
+
+- Two ways to keep a user logged in: sessions and JWT tokens.
+- JWT tokens are hard to use as they are self-contained, i.e., once generated and given to a user, they can always log in with it; there's no way to invalidate an existing JWT token.
+- However, invalidating a session after log in is essential, for instance whenever a user changes their password, they should be logged out of all other devices/sessions as well.
+- One option is to keep these tokens short-lived and then refresh them again.
+
+- Sessions work by storing a user's key in a cookie and there is a corresponding entry in the DB on your server for each session.
+- Then to invalidate the session for the user, simply delete this DB entry.
+
+
+79. Connect-Mongo Package
+
+- Another package needed to store our session information.
+- Recommended to use Redis DB installed on our own server.
+- However, for ease-of-use, MongoDB works.
+  $ npm i connect-mongo
+
+
+- Create @types folder and add type declaration here for express-session userId.
+- Make changes in tsconfig.json as well.
+- ts-node added since it is required tp automatically restart our server and helps recognize the types.
+
+
+80. Express Session Middleware in app.ts
+
+- Need to add this at the right place before the routes but after the JSON is read.
+- Add a session() call and add some fields such as secret which helps assign a cookie that stores a key to identify a user session.
+- In .env file, a SESSION variable and assign a random text phrase as the session secret.
+- Add to validateEnv.ts as well so that these are available during runtime.
+- Cookie duration and other details added.
+- Rolling means that as long as user is logged in or logs in within the duration of the cookie time, cookie is refreshed automatically and the user stays signed in.
+
+
+81. Endpoint Controllers + Route for Login
+
+- Create a function for login similar to signup.
+- Explicitly select password and email to be returned from the response as we had set their select field as false in the user model definition.
+- Sending message for invalid credentials makes it slightly tougher to bypass security as it is not clear whether username doesn't exist or password is incorrect.
+
+
+82. Endpoint for Fetching Authenticated User
+
+- This is done so that already logged in user doesn't have to login again within a certain time duration (cookie expiry duration).
+- If cookie isn't present, then user isn't authenticated; this happens when cookie expires.
+- But if cookie duration not yet over, then user is authenticated.
+
+
+83. Endpoint for Logout
+
+- GET vs POST: the latter is preferred as we are changing something, some state in the backend on our side.
+- Use req.session.destroy to kill sessions.
+- Using sendStatus as we are not sending any JSON.
+  - I have used status().json() and sending a custom message for logout confirmation.
+- This will also clear sessions from DB.
+
+
+
+------------------------------------------------------------------------------
+
+
+
+XVI. Frontend Authentication
+
+
+84. 
+
+- 
 
 
 
