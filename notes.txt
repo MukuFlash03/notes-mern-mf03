@@ -636,10 +636,359 @@ VII. Updating and Deleting Notes
 VIII. React Setup + Declarative UI
 
 
-48. 
+48. Create new React app
+
+
+- Run create React app command in root directory
+  $ npx create-react-app frontend --template typescript
+
+- In react, all dependencies are grouped together and not segregated into dev dependencies and normal dependencies; anyways once build is ready, any dependencies not in use will be stripped away.
+
+- To fix vulnerabilities, any of these might or might not work:
+  $ npm audit; $ npm audit fix; $ npm audit fix --force
+
+
+49. Run React App
+
+- Use this to start React app in localhost port.
+  $ npm start
+- Can now see blue rotating React logo.
+- Changes to the web page can be seen instantaneously.
+
+- .tsx files are a hybrid version of HTML and JS/TS files.
+- This is where our main frontend code will be written.
+
+
+50. React Declarative UI
+
+- React is a declarative UI framework.
+- In an imperative UI, we have to micromanage each element in the frontend whenever something changes.
+- We have separate HTML and JS files, can identify each element in HTML by using getElementById() in JS files and then change the element's contents.
+- This leads to many difficulties as the project grows and not easy to handle bugs.
+
+- In a declarative UI, React takes care of keeping the data in sync with the frontend visual UI elements.
+- We just define and declare elements once and updates to contents can occur automatically.
+- Also, JSX files use both HTML and JS and hence code logic can be integrated in the same place.
+- This also allows us to create reusable components.
+- This is the better approach since earlier separation of HTML and JS was separation of technologies rather than concerns.
+
+
+51. Install React Bootstrap
+
+- Makes it easier to build good-looking UIs.
+  $ npm install react-bootstrap bootstrap
+
+- Add import for bootstrap CSS in index.tsx file.
+- This file basically initializes our React app.
+- It uses public/index.html for this.
+
+- Change basic info like title, etc. in these files.
+
+
+52. Adding a Button
+
+- In React, we must use a special type of variable for the state of a component so that React knows that it has to redraw the UI with the updated value of the variable.
+- We will create a new state with the variable name and function name enclosed in a pair of [].
+  -  const [clickCount, setClickCount] = useState(0);
+- Assign the value returned by useState(0) to these array variables; 0 defines initial value.
+
+- Add a Button from the React library in the return() code below.
+- Bootstrap CSS should be applied automatically.
+- Enclose the clickCount variable using {} to display dynamically updated count.
+- Write code logic for setCount() function in the Button onClick field.
+  
+  <Button onClick={() => setClickCount(clickCount + 1)}>
+      Clicked Me {clickCount} times!
+  </Button>
+
+
+------------------------------------------------------------------------
+
+
+IX. Fetching Notes from Backend onto Frontend
+
+
+53. Notes Model in Frontend
+
+- This model contains all fields that will be visible in the frontend or required for access to unique notes.
+- For instance, timestamp not defined explicitly in backend since MongoDB took care of it; however it is required in the Frontend.
+- Create a models directory under src and create a new interface for Note inside note.ts file.
+- Create a new state for Notes and set the type to created Note interface.
+
+
+54. UseEffect
+
+- Where do we load notes?
+- Cannot add them in return or react App.tsx since this code redraws UI or renders UI everytime.
+- We want our notes to be loaded only once when the app starts.
+
+- For this we utilize useEffects with which we can execute side effects outside of the render code.
+- We have control over when it executes and how often.
+
+
+- We must also pass a dependency array to useEffect.
+- This array contains variables that trigger useEffect whenever they change.
+- If no array passed, useEffect executed on every render.
+- If empty array passed, useEffect executed only once.
+
+- Add JSON.stringify(notes) in HTML section.
 
 
 
+55. Run app to Test
+
+- Start app in both backend and frontend in different terminals: $ npm start
+- Had to change port numbers since same ports can't be used by both.
+- Backend: 4000, Frontend: 3000
+
+
+56. CORS
+
+- Cross-origin Resource Sharing
+- Gives some errors.
+- This acts as a security mechanism by blocking backend access by the frontend as they are on different addresses/ports.
+- Eventually, we will run both frontend and backend on the same URL with the backend server hidden behind several endpoints.
+- In React, we can use proxy to make the two components appear to be on the same address.
+- Postman was able to access backend data since this security mechanism is enforced by browsers.
+
+- Additionally, it can be seen that everything is executed twice: error messages logged, pop-up alerts, etc.
+- This happens because React renders everything twice in development; in production everything done only once.
+
+- To handle CORS, add proxy: URL for backend port to package.json in frontend.
+- To handle using npm package core, read documentation; this method will be of use when dealing with public APIs.
+
+
+------------------------------------------------------------------------
+
+
+X. React Components + CSS Modules
+
+
+57. Components for Notes
+
+- Create React components which will define layout for a note.
+- React components are all created in the form of functions nowadays; earlier they were created as classes too.
+- Create a new directory components in src and a new file Note.tsx.
+
+- We will define an arrow function and default export it.
+- Also needed an interface to declare the type of data each Note would receive.
+- A good naming convention for the interface is componentProps, where Props refers to the arguments that we pass to our component.
+
+
+58. Note Cards
+
+- Next, we'll be using Bootstrap React cards to display our notes.
+- The args passed to components, i.e., props are similar to states wherein if any changes occur to the objects themselves, React knows that it has to render these again based on their latest values.
+- Define a Note Card in HTML format in Note.tsx.
+- Add a corresponding Note Card type in the return() of App.tsx in place of JSON.stringify() using notes.map() to convert each note from the notes array into a Card.
+- Restructure the note into all fields and use them directly in Note.tsx in components.
+
+
+59. CSS Modules
+
+- Delete the App.css file and its corresponding imports.
+- We'll be keeping index.css as the global CSS file, which is required since some elements need to be set up only once globally.
+- Rename it to global.css and update it in its import in index.tsx as well.
+
+- For our note components we'll create a separate CSS to avoid clashes.
+- Create a new folder styles in src.
+- Move global CSS file here as well; update imports.
+
+- Create Note.module.css file and add two classes .noteCard and .cardText.
+- Add these classes to the Card and Card.Text tags respectively.
+- HTML tags have classes but JSX/TSX files have classNames since class is a reserved keyword in these languages.
+
+
+
+------------------------------------------------------------------------
+
+
+XI. Finishing the Notes Styling
+
+
+60. Create Grids
+
+- Change div tag to React's Container tag in App.tsx.
+- Use Row tag to add dynamic resizing.
+- Use Col tag to create horizontal separation.
+
+
+- Create another CSS file: NotesPage.module.css.
+- Add hover classes.
+- To include this, add another property className to interface NoteProps in Note.tsx.
+- Pass this to the Note function and include it as another className in the Card tag.
+
+
+61. Add CSS Hover styling and Overflow handling
+
+- Add box shadows and transitions
+- Handle text overflow in Note.module.css
+
+
+62. Timestamp 
+
+- Add a Card Footer.
+- To format date, separate concerns by writing this code in another file: utils/formatDate.ts.
+- Then use this with a if-else logic in the Note component.
+- Since it is a cheap operation, can be used here directly even though it will be performed on every render.
+- Alternatives are to use useEffect, useMemo, etc.
+
+
+------------------------------------------------------------------------
+
+
+XII. Create Notes from Frontend
+
+
+63. Separate HTTP Methods from React
+
+- Create a new directory network and a new file notes_api.ts.
+- Move GET endpoint code in useEffect from App.tsx to this file.
+- Create two new fetch notes functions.
+
+
+64. Create Notes function
+
+- Add a new function to create notes in notes_api.ts.
+- Create an interface for it.
+- Write code for the POST method similar to GET method written in fetchData().
+- Some more fields are passed as a part of the POST JSON object.
+
+
+65. React Form Component to Add Notes
+
+- Create a new file AddNoteDialog.tsx in components.
+- Install React snippets (simple) extension.
+- Use src to add the AddNoteDialog component.
+- Use Modal tags to build the component.
+
+- In App.tsx, create a new state for the component to be shown or not.
+- Add it in the Container as well if the state variable is true.
+- Doing it this way so that each time the form is cleared, the contents are cleared as well and previous state content is not retained.
+
+- Add a Button to add new notes as well.
+- Here, set ShowAddNoteDialog to true using the useState set variable function.
+
+
+66. Close Button logic
+
+- Create an interface for the AddNoteDialogProps.
+- Define onDismiss here; no args and no return data.
+- Add this as the arrow function call for onHide under Modal tag.
+- Add onDismiss property to AddNoteDialog tag in App.tsx.
+
+
+67. Input Form
+
+- Create Form Groups under Modal.Body
+- 1st group for Form title; 2nd for Form content.
+- Modal.Footer contains form submit Button.
+- Form property is used to connect the submit button to the form since both are separated and not connected in the React code.
+
+- Using a package so it is easier to manage states in React forms.
+  $ npm i react-hook-form
+- Hook returns different kinds of data and functions in our form that we use in our form and will have to destructure the variable.
+
+- Add another property to the interface for form save status.
+- Add onSubmit function code logic.
+- Connect HTML forms to React Form Hook using ellipsis and register().
+- Add error handling in case of missing title using errors and isInvalid property.
+
+- Add disabled property to Submit button based on isSubmitting.
+
+
+68. Add onNoteSaved callback property to App.tsx
+
+- Add this to the AddNoteDialog tag.
+- Set the show boolean variable as false.
+- Also, set the notes as all the notes plus the latest note.
+
+
+69. Utility Classes for Button CSS
+
+- These CSS files are created for those components whose styling is already defined for some other component and just need to reuse some styles.
+- Add block center class with display as block and margin sizes.
+- Add this property to note submit Button in App.tsx.
+ 
+
+------------------------------------------------------------------------------
+
+
+
+XIII. Updating and Deleting Notes from Frontend
+
+
+70. Delete Notes
+
+- Add a function in notes_api.ts.
+- Install the React icons package
+  $ npm i react-icons
+
+- Add the icon tag in Note.tsx.
+- Import MdDelete; md stands for material design - UI by Google.
+
+
+- Add property to interface.
+- Define this property function callback to occur onClick of delete button.
+- Prevent propagation of this click to future events or triggers, for instance when we want to update note.
+
+- Add property callback in App.tsx as well.
+- Create a new function for deleting here as well.
+- In setNotes use filter to skip the note to be deleted.
+
+
+71. Add Icon to Add Note Button
+
+- Use the react-icons package.
+- FaPlus icon to be added.
+- Add flex center class to Button property.
+
+
+
+72. Update Notes
+
+- Create function in notes_api.ts.
+- This is similar to POST function but with PATCH as the HTTP method.
+
+- Change AddNoteDialog -> AddEditNoteDialog.
+- Add new property to interface AddEditNoteDialogProps.
+- Edit the onSubmit code logic to include both update existing note and create new note logic.
+
+- Update title in Modal.Title to include both update/create note scenarios.
+
+
+73. Note Click Operation in UI
+
+- Add another callback function to NoteProps interface in Note.tsx.
+- Add it to the onClick property of the note Card tag.
+
+- Add it in App.tsx as well.
+- Create a new state for this.
+- Add another AddEditNoteDialog tag like the prior one for showAddEditNoteDialog but this time for noteToEdit.
+
+
+------------------------------------------------------------------------------
+
+
+XIV. Loading/Error/Empty States
+
+
+74. Loading and Error States
+
+- Add two new states for these in App.tsx.
+- Call set methods for these state variables in try, catch and finally blocks of the getNotes().
+
+
+- Fragments in React allow us to put multiple HTML tags in places where we are generally allowed to use only one tag.
+- Added boolean checks on these states as done earlier.
+
+------------------------------------------------------------------------------
+
+
+XV. User Authentication with Express Sessions
+
+
+75. 
 
 
 

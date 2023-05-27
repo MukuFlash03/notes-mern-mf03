@@ -25,5 +25,13 @@ https://github.com/postmanlabs/postman-app-support/issues/9097
 
 - If connected to a new network, need to add IP address in MongoDB Atlas web UI.
 
+4. Ignoring Tracked files in github
 
+https://stackoverflow.com/questions/45400361/why-is-gitignore-not-ignoring-my-files
+https://stackoverflow.com/a/53431148
+
+Need to remove cached files.
+$ git rm -r --cached .
+$ git add .
+$ git commit -m "Untrack files in .gitignore"
 
