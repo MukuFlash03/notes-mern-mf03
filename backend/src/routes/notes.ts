@@ -1,12 +1,6 @@
 import express from "express";
 import * as NotesController from "../controllers/notes";
 
-/*
-app.get("/", (req, res) => {
-    res.send("Hola World!");
-});
-*/
-
 const router = express.Router();
 
 router.get("/", NotesController.getNotes);

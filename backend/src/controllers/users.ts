@@ -1,17 +1,12 @@
+import bcrypt from 'bcrypt';
 import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import UserModel from '../models/user';
-import bcrypt from 'bcrypt';
 
 
 export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.session.userId;
-
     try {
-        if (!authenticatedUserId) {
-            throw createHttpError(401, 'User not authenticated');
-        }
-
         const user = await UserModel.findById(authenticatedUserId).select("+email").exec();
         res.status(200).json(user);
     } catch (error) {
@@ -73,7 +68,7 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
             throw createHttpError(400, 'Missing required fields');
         }
 
-        const user = await UserModel.findOne({ username: username}).select("+password +email").exec();
+        const user = await UserModel.findOne({ username: username }).select("+password +email").exec();
 
         if (!user) {
             throw createHttpError(401, "Invalid login credentials!");

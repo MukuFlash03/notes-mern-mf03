@@ -10,3 +10,7 @@
     align-items: center;
     gap: 4px;
 }
+
+.width100 {
+    width: 100%;
+}

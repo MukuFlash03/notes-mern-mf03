@@ -1083,18 +1083,230 @@ XV. User Authentication with Express Sessions
 XVI. Frontend Authentication
 
 
-84. 
+84. Create User Model in Frontend
 
-- 
-
-
-
-
+- Create a new file user.ts in frontend/models.
+- Need only username and email since we might want to display these two on frontend.
+- Id not required since username serves as Id; Password is sensitive information that we don't want to display on frontend.
 
 
+85. Add Network Routes in notes_api.ts for Fetching User
+
+- Add a GET endpoint route for the user.
+- Since frontend and backend are on the same URL (api/users), no need to pass in credentials explicitly in code (in fetch()); cookies passed automatically. 
+
+
+86. Endpoint for SignUp
+
+- Add interface with type declarations for required fields: username, email, password.
+- Create function to fetch response and use POST method to send info.
+
+
+87. Endpoint for Login
+
+- Add interface with type declarations for required fields: username, email, password.
+- Create function to fetch response and use POST method to send info.
+
+88. Endpoint for Logout
+
+- Simple call fetchData() with await; if any errors, the function will send an appropriate response.
+
+
+89. Form Models for User Authentication
+
+- We are essentially creating a reusable form component tag that we will use in place of the one already defined in AddEditNoteDialog.tsx.
+
+- Create a form directory under components.
+- Create a new file TextInputField.tsx.
+- Create an interface for the form text fields.
+- Create an arrow function for the TextInputField.
+- Use [x: string]: any to keep room for any additional properties that may be added outside of the ones explicitly defined.
+
+- ControlID property helps screen readers and also connects the form label in the form group with the input field so that it is activated on clicking the label.
 
 
 
+90. Replace Form Group in AddEditNoteDialog.tsx
+
+- Use the custom component TextInputField to build the form.
+- Additional properties used here as defined earlier in Props using [x] such as type, placeholder.
+
+
+91. SignUp Modal Component
+
+- Create a new file in components.
+- Create an arrow function for the new SignUpModal component and export it.
+- Base this file similar to the one in AddEditNoteDialog.tsx.
+- Add component in App.tsx as well.
+
+
+92. Login Modal Component
+
+- Create this similar to the SignUp Modal.
+- Use the sfc abbreviation to generate some starter code.
+- Built the Modal similar to SignUp Modal.
+- Add component in App.tsx as well.
+
+
+93. Add NavBar
+
+- Create a new component NavBar.tsx (differs from Reacts inbuilt Navbar).
+- Use sfc to create the template.
+- We are passing callback to the signup and login modals and not directly performing authentication in Navbar.
+  - This is because we might have other triggers for these modals which may not need clicking buttons in Navbar to trigger them.
+- For Logout we can handle it directly here and clear stored user's data.
+
+- Navbar shows different content based on Login status:
+  - Logged In: Username, Logout button
+  - Logged Out: Signup, Login buttons
+
+- Add NavBar toggle and collapse properties.
+
+
+94. Add Logged In View NavBar Component
+
+- Create a file similar to modal components.
+- Using a fragment so that we can return multiple elements.
+
+
+95. Add Logged Out View NavBar Component
+
+- Create a file similar to modal components.
+- File content is similar to Logged In view component.
+
+
+
+96. Restructure Code
+
+- Move some code from App.tsx into a new file in Components.
+- Two file for this: NotesPageLogged { In/Out } View.tsx
+
+
+97. Connect Components in App.tsx
+
+- Create a state for logged in users; cookies send credentials automatically and hence if logged in, user is returned, else 401 response.
+- Create a state for displaying SignUp and Login Modals.
+
+- As soon as we open this page, we want to try loading the user, which then becomes a side effect, hence we use a useEffect.
+- Empty array [] added in useEffect to enforce that this is executed only once in the beginning during initialization.
+
+- Set up this useEffect similar to the useEffect for getNotes in NotesPageLoggedInView.tsx.
+
+
+98. Fill in Parameters of Components in App.tsx
+
+- Pass loggedInUser to NavBar.
+- Similarly set appropriate values for the button clicked callbacks.
+
+- Set the fragmented conditional to display Notes logged in and out views if user is logged in.
+- Move conditionals out of Container and fill in their parameterized callbacks.
+
+
+--------------------------------------------------------------------------------
+
+
+XVII. Protecting User Notes with Middleware
+
+
+
+99. Tying Notes to a Specific User
+
+- Add a userId field to each Note with a type of Mongoose Schema Object ID; this edit is to be done in backend/src/model/note.ts.
+- Create a reusable function for authentication check; this is currently present in getAuthenticatedUser() in controllers/users.ts.
+- Make these changes in a new directory-file: middleware/auth.ts.
+- In routes/users.ts, add this function as the next middleware to be executed before moving on to the endpoint handler.
+- Since all our notes endpoints will require this auth check middleware, we can add it one level higher to the main route endpoint in app.ts, instead of adding it to each internal sub endpoint.
+
+
+100. Util Function for Non-Null Assertion
+
+- Create a new file in utils directory.
+- Create a new util function to check and assert whether user is logged in and undefined value isn't present.
+- Use generic type <T> and not any since we want to ensure we have non-nullable values.
+- Then use this function call wherever we are first fetching the value of the authenticated user's ID to ensure that it is defined.
+- Now, add a userId key value to the find() call where notes are being fetched for the user.
+
+- Add similar logic for all Notes endpoints.
+
+- Once done, every user will have their own notes.
+- Previously created notes are now only accessible via the MongoDB Atlas UI and not from the web app UI.
+
+
+--------------------------------------------------------------------------------
+
+
+XVIII. Routing with React-router
+
+
+101. React Router Package
+
+- React apps are mostly single page apps (SPAs), where components are rendered and disabled as and when needed.
+- With this package, we can create multiple pages for our web app and navigate between them.
+- This package maps different components as pages with different relative URLs.
+  $ npm i react-router-dom
+
+
+102. Segregate Pages
+
+- Create a new directory Pages and a new file NotesPage.tsx.
+- Separate hardcoded notes page present under Container tag in App.tsx.
+
+
+103. Privacy Page and Not Found Page
+
+- Create a new page for Privacy information.
+- Create a new page for resource Not Found.
+
+
+104. Browser Router tag
+
+- Wrap the entire return div in App.tsx in a Browser Router tag.
+- Add a Container which has a Routes tag after the NavBar and before the Button Modals.
+  - Between these two sections as the NavBar will always remain fixed and the Modals can show up on any page depending on action chosen.
+- Add the three pages as routes using the Route tag.
+
+
+105. Additional CSS Styling
+
+- Create a new file App.module.css
+- Introduce some padding around page elements; applied to entire main container.
+
+
+106. Privacy Page and Home Page Buttons
+
+- Add a new Nav tag in NavBar.tsx above the RHS buttons.
+- We can use a simple href attribute but this causes the entire page to refresh which is not the way a React app should look and feel like.
+  - It should only refresh or re-render the components that need to reload and leave the rest of the page as it is.
+
+- For this we use a Link tag inside a Nav.Link tag.
+- However, this messes up the CSS styling.
+- To solve this, add the as and to attributes to the Nav.Link tag itself and remove the Link tag inside of it.
+
+
+- Similarly, add the Home page link for the Notes App text in the Navbar.
+
+
+-----------------------------------------------------------------------------
+
+
+XIX. Handling Different HTTP Errors in React
+
+
+107. Distinguish Error Alerts via Subclasses
+
+- Create a new directory errors/ with a file http_errors.ts.
+
+- Subclass of HttpError will have class name as the name attribute.
+
+- Now, in notes_api.ts check for each kind of error status code and throw the appropriate error class as defined above.
+- New keyword required to instantiate custom class objects as compared to generic pre-built Error class objects.
+
+
+
+108. In-place Error Messages 
+
+- Display errors in place, for instance, invalid credentials displayed in the Login Modal popup box itself and not as a separate pop-up box.
+- Changes to be made in LoginModal.tsx.
 
 
 
